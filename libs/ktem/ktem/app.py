@@ -14,6 +14,7 @@ from theflow.settings import settings
 from theflow.utils.modules import import_dotted_string
 
 BASE_PATH = os.environ.get("GRADIO_ROOT_PATH", "")
+OCT_DEMO_MODE = getattr(settings, "OCT_DEMO_MODE", False)
 
 
 class BaseApp:
@@ -45,7 +46,8 @@ class BaseApp:
         self._theme = KotaemonTheme()
 
         dir_assets = Path(__file__).parent / "assets"
-        with (dir_assets / "css" / "main.css").open() as fi:
+        css_file = "demo.css" if OCT_DEMO_MODE else "main.css"
+        with (dir_assets / "css" / css_file).open() as fi:
             self._css = fi.read()
         with (dir_assets / "js" / "main.js").open() as fi:
             self._js = fi.read()

@@ -27,6 +27,8 @@ if not KH_APP_VERSION:
 
 KH_ENABLE_FIRST_SETUP = True
 KH_DEMO_MODE = config("KH_DEMO_MODE", default=False, cast=bool)
+OCT_DEMO_MODE = config("OCT_DEMO_MODE", default=False, cast=bool) # Demo mode defaults to usage of "LightRAG Collection" in minimal the chart Ui
+KH_APP_NAME = config("KH_APP_NAME", default='Octostar Ai', cast=str)
 KH_OLLAMA_URL = config("KH_OLLAMA_URL", default="http://localhost:11434/v1/")
 
 # App can be ran from anywhere and it's not trivial to decide where to store app data.
@@ -69,7 +71,7 @@ KH_FEATURE_CHAT_SUGGESTION = config(
     "KH_FEATURE_CHAT_SUGGESTION", default=False, cast=bool
 )
 KH_FEATURE_USER_MANAGEMENT = config(
-    "KH_FEATURE_USER_MANAGEMENT", default=True, cast=bool
+    "KH_FEATURE_USER_MANAGEMENT", default=False, cast=bool
 )
 KH_USER_CAN_SEE_PUBLIC = None
 KH_FEATURE_USER_MANAGEMENT_ADMIN = str(

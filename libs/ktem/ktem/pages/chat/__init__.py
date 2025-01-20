@@ -31,6 +31,8 @@ from .control import ConversationControl
 from .report import ReportIssue
 
 KH_WEB_SEARCH_BACKEND = getattr(flowsettings, "KH_WEB_SEARCH_BACKEND", None)
+OCT_DEMO_MODE = getattr(flowsettings, "OCT_DEMO_MODE", False)
+
 WebSearch = None
 if KH_WEB_SEARCH_BACKEND:
     try:
@@ -151,7 +153,13 @@ class ChatPage(BasePage):
                         gr_index = index_ui.as_gradio_component()
 
                         # get the file selector choices for the first index
-                        if index_id == 0:
+                        if OCT_DEMO_MODE and index.name == "LightRAG Collection":
+                            self.first_selector_choices = index_ui.selector_choices
+                            self.first_indexing_url_fn = None
+
+                            # Store the index UI for later use if needed
+                            self.lightrag_index_ui = index_ui
+                        elif not OCT_DEMO_MODE and index_id == 0:
                             self.first_selector_choices = index_ui.selector_choices
                             self.first_indexing_url_fn = None
 
@@ -974,7 +982,10 @@ class ChatPage(BasePage):
                 if isinstance(index.selector, int):
                     index_selected = selecteds[index.selector]
                 if isinstance(index.selector, tuple):
-                    for i in index.selector:
+                    for idx, i in enumerate(index.selector):
+                        # if OCT_DEMO_MODE and index.name == 'LightRAG Collection' and idx == 1 and not selecteds[i]:
+                        #     index_selected.append(OCT_DEFAULT_FILE_SELECTION_LIST)
+                        # else:
                         index_selected.append(selecteds[i])
                 iretrievers = index.get_retriever_pipelines(
                     settings, user_id, index_selected

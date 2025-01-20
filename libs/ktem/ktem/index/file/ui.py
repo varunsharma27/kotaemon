@@ -21,6 +21,8 @@ from theflow.settings import settings as flowsettings
 
 from ...utils.commands import WEB_SEARCH_COMMAND
 
+OCT_DEMO_MODE = getattr(flowsettings, "OCT_DEMO_MODE", False)
+
 DOWNLOAD_MESSAGE = "Press again to download"
 MAX_FILENAME_LENGTH = 20
 
@@ -1439,8 +1441,22 @@ class FileSelector(BasePage):
         self.on_building_ui()
 
     def default(self):
-        if self._app.f_user_management:
+        if (not OCT_DEMO_MODE or self._index.name != "LightRAG Collection") and self._app.f_user_management:
             return "disabled", [], -1
+        
+        # Check if this is the LightRAG Collection index
+        if OCT_DEMO_MODE and self._index.name == "LightRAG Collection":
+            print(f"OSTest: LightRAG Collection, trying to set default")
+            # Get the first file ID for this index
+            with Session(engine) as session:
+                statement = select(self._index._resources["Source"]).limit(1)
+                result = session.execute(statement).first()
+                first_file_id = result[0].id if result else None
+                
+                print(f"OSTest: LightRAG Collection, setting default {first_file_id}")
+                # Return "select" mode with the first file selected
+                return "select", [first_file_id] if first_file_id else [], 1
+                
         return "disabled", [], 1
 
     def on_building_ui(self):
@@ -1466,7 +1482,7 @@ class FileSelector(BasePage):
         self.selector_user_id = gr.State(value=user_id)
         self.selector_choices = gr.JSON(
             value=[],
-            visible=False,
+            visible=default_mode == "select",
         )
 
     def on_register_events(self):
@@ -1547,6 +1563,9 @@ class FileSelector(BasePage):
             selected_files = [
                 each for each in selected_files if each in available_ids_set
             ]
+        # Set default selection for LightRAG Collection in demo mode
+        elif OCT_DEMO_MODE and self._index.name == "LightRAG Collection" and available_ids:
+            selected_files = [available_ids[0]]
 
         return gr.update(value=selected_files, choices=options), options
 
