@@ -1,5 +1,26 @@
 <div align="center">
 
+# Building release images:
+Creating a release image for Octostar:
+```bash
+docker build \
+  --ssh default \
+  --label description="Octostar Kotaemon RAG v0.4" \
+  -t octostar/app.kotaemon:rag-0.4 \
+  --target full \
+  .
+```
+
+Pushing the image to Octostar's container registry:
+```bash
+docker push octostar/app.kotaemon:rag-0.4
+```
+
+Testing the image locally:
+```bash
+docker run -v ./.env:/app/.env -e GRAPHRAG_API_KEY=API_KEY_VALUE -p 8080:8080 -it octostar/app.kotaemon:rag-0.4
+```
+
 # kotaemon
 
 An open-source clean & customizable RAG UI for chatting with your documents. Built with both end users and
